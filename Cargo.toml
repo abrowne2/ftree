@@ -12,10 +12,11 @@ readme = "README.md"
 
 
 [dependencies]
-serde = { version = "1.0.151", optional = true, features = ["derive"] }
-
+serde = { version = "1.0.151", features = ["derive"] }
+rkyv = { git = "https://github.com/praveenperera/rkyv", branch = "0.7", features = [
+    "indexmap",
+    "validation",
+    "strict",
+]}
 [dev-dependencies]
 ntest = "0.9"
-
-[features]
-serde = ["dep:serde"]

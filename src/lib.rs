@@ -1,20 +1,45 @@
 #![cfg_attr(not(test), no_std)]
 extern crate alloc;
 use alloc::vec::Vec;
+use rkyv::AlignedVec;
 use core::ops::{AddAssign, SubAssign};
 
-#[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[derive(Debug, Clone, PartialEq, Eq, Ord, PartialOrd, Hash)]
-pub struct FenwickTree<T> {
+#[derive(
+    Default,
+    Deserialize,
+    Serialize,
+    Clone,
+    PartialEq,
+    rkyv::Archive,
+    rkyv::Deserialize,
+    rkyv::Serialize,
+    Debug,
+    Eq,
+    Ord,
+    PartialOrd,
+    Hash,
+)]
+#[archive(bound(
+    serialize = "T: rkyv::Archive + rkyv::Serialize<__S>, __S: rkyv::ser::Serializer + rkyv::ser::SharedSerializeRegistry + Sized"
+))]
+#[archive(bound(
+    deserialize = "T: rkyv::Archive, <T as rkyv::Archive>::Archived: rkyv::Deserialize<T, __D>, __D: rkyv::de::SharedDeserializeRegistry"
+))]
+pub struct FenwickTree<
+T: rkyv::Archive
++ rkyv::Serialize<rkyv::ser::serializers::AlignedSerializer<AlignedVec>>
++ 'static,
+> {
     inner: Vec<T>,
 }
 
 impl<T> FromIterator<T> for FenwickTree<T>
 where
-    T: Copy + AddAssign,
+    T: Copy + AddAssign + rkyv::Archive
+        + rkyv::Serialize<rkyv::ser::serializers::AlignedSerializer<AlignedVec>>
+        + 'static,
 {
     /// Creates a new fenwick tree.
     ///
@@ -54,7 +79,12 @@ impl<const N: usize> From<[usize; N]> for FenwickTree<usize> {
     }
 }
 
-impl<T> FenwickTree<T> {
+impl<T> FenwickTree<T>
+where
+    T: rkyv::Archive
+        + rkyv::Serialize<rkyv::ser::serializers::AlignedSerializer<AlignedVec>>
+        + 'static,
+{
     /// Creates an empty fenwick tree.
     ///
     pub const fn new() -> Self {
@@ -72,7 +102,12 @@ impl<T> FenwickTree<T> {
     }
 }
 
-impl<T> FenwickTree<T> {
+impl<T> FenwickTree<T>
+where
+    T: rkyv::Archive
+        + rkyv::Serialize<rkyv::ser::serializers::AlignedSerializer<AlignedVec>>
+        + 'static,
+{
     /// Computes the prefix sum up until the desired index.
     ///
     /// The prefix sum up until the zeroth element is 0, since there is nothing before it.
