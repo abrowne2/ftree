@@ -21,6 +21,7 @@ use serde::{Deserialize, Serialize};
     PartialOrd,
     Hash,
 )]
+#[archive(check_bytes)]
 #[archive(bound(
     serialize = "T: rkyv::Archive + rkyv::Serialize<__S>, __S: rkyv::ser::Serializer + rkyv::ser::SharedSerializeRegistry + Sized"
 ))]
